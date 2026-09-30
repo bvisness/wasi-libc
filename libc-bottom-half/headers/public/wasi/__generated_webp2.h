@@ -9,6 +9,24 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h>
 
+typedef struct webp2_own_date_t {
+  int32_t __handle;
+} webp2_own_date_t;
+
+typedef struct webp2_borrow_date_t {
+  int32_t __handle;
+} webp2_borrow_date_t;
+
+// Imported Functions from `webp2`
+extern double webp2_static_date_now(void);
+
+// Helper Functions
+
+extern void webp2_date_drop_own(webp2_own_date_t handle);
+
+extern webp2_borrow_date_t webp2_borrow_date(webp2_own_date_t handle);
+
+
 #ifdef __cplusplus
 }
 #endif

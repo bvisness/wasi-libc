@@ -18,11 +18,18 @@
 
 #if defined(__wasip1__)
 typedef __wasi_timestamp_t wasilibc_timestamp_t;
-#elif defined(__wasip2__) || defined(__webp2__)
+#elif defined(__wasip2__)
 typedef wall_clock_datetime_t wasilibc_timestamp_t;
 #elif defined(__wasip3__)
 typedef filesystem_instant_t wasilibc_timestamp_t;
 typedef monotonic_clock_mark_t monotonic_clock_instant_t;
+#elif defined(__webp2__)
+typedef struct wasilibc_timestamp_t {
+  uint64_t   seconds;
+  uint32_t   nanoseconds;
+} wasilibc_timestamp_t;
+typedef uint64_t monotonic_clock_instant_t;
+typedef uint64_t monotonic_clock_duration_t;
 #else
 # error "Unknown WASI version"
 #endif
@@ -104,14 +111,15 @@ static inline struct timeval timestamp_to_timeval(
 
 static inline struct timespec timestamp_to_timespec(
   wasilibc_timestamp_t *timestamp) {
-#if defined(__wasip2__)
+#if defined(__wasip2__) || defined(__webp2__)
   // Check for overflow when converting unsigned to signed
   if (timestamp->seconds > INT64_MAX) {
     return (struct timespec){.tv_sec = INT64_MAX, .tv_nsec = NSEC_PER_SEC - 1};
   }
-#endif
+#else
   return (struct timespec){.tv_sec = timestamp->seconds,
                            .tv_nsec = timestamp->nanoseconds};
+#endif
 }
 
 static inline struct timespec instant_to_timespec(

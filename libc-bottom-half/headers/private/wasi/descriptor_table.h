@@ -137,7 +137,7 @@ typedef struct wasi_read_t {
   bool blocking;
   // The timeout, in nanoseconds, for this operation.
   monotonic_clock_duration_t timeout;
-#ifdef __wasip2__
+#if defined(__wasip2__)
   // The `wasi:io/streams.input-stream` that this is reading from.
   streams_borrow_input_stream_t input;
   // A required pointer to an owned pollable for `input`. This is lazily
@@ -159,7 +159,7 @@ typedef struct wasi_write_t {
   bool blocking;
   monotonic_clock_duration_t timeout;
 
-#ifdef __wasip2__
+#if defined(__wasip2__)
   streams_borrow_output_stream_t output;
   poll_own_pollable_t *pollable;
 #else

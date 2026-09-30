@@ -2,6 +2,11 @@
 #include "wasi/webp2.h"
 #include <stdlib.h>
 
+// Imported Functions from `webp2`
+
+__attribute__((__import_module__("$root"), __import_name__("[static]date.now")))
+extern double __wasm_import_webp2_static_date_now(void);
+
 // Canonical ABI intrinsics
 
 __attribute__((__weak__, __export_name__("cabi_realloc")))
@@ -13,7 +18,25 @@ void *cabi_realloc(void *ptr, size_t old_size, size_t align, size_t new_size) {
   return ret;
 }
 
+// Helper Functions
+
+__attribute__((__import_module__("$root"), __import_name__("[resource-drop]date")))
+extern void __wasm_import_webp2_date_drop(int32_t handle);
+
+void webp2_date_drop_own(webp2_own_date_t handle) {
+  __wasm_import_webp2_date_drop(handle.__handle);
+}
+
+webp2_borrow_date_t webp2_borrow_date(webp2_own_date_t arg) {
+  return (webp2_borrow_date_t) { arg.__handle };
+}
+
 // Component Adapters
+
+double webp2_static_date_now(void) {
+  double ret = __wasm_import_webp2_static_date_now();
+  return ret;
+}
 
 // Ensure that the *_component_type.o object is linked in
 
