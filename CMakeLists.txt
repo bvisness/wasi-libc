@@ -79,8 +79,11 @@ elseif(TARGET_TRIPLE MATCHES "-wasip2$")
 elseif(TARGET_TRIPLE MATCHES "-wasip3$")
   set(WASI p3)
   set(SHARED ON)
+elseif(TARGET_TRIPLE MATCHES "-webp2")
+  set(WEB p2)
+  set(SHARED ON)
 else()
-  message(FATAL_ERROR "Unknown WASI target triple: ${TARGET_TRIPLE}")
+  message(FATAL_ERROR "Unknown target triple: ${TARGET_TRIPLE}")
 endif()
 
 if(BUILD_SHARED)
@@ -149,12 +152,15 @@ elseif(WASI STREQUAL "p2")
   set(__wasip2__ ON)
 elseif(WASI STREQUAL "p3")
   set(__wasip3__ ON)
+elseif(WEB STREQUAL "p2")
+  set(__webp2__ ON)
 else()
   message(FATAL_ERROR "Unknown WASI version: ${WASI}")
 endif()
 
 set(wasip2-version 0.2.12)
 set(wasip3-version 0.3.0)
+set(webp2-version 0.2.0)
 
 # =============================================================================
 # Detection of a libcall thread context for wasip3
@@ -251,7 +257,7 @@ check_c_compiler_flag(-fdefer-ts HAVE_FDEFER_TS)
 if(HAVE_FDEFER_TS)
   add_compile_options(-fdefer-ts)
 elseif(NOT WASI STREQUAL "p1")
-  message(FATAL_ERROR "wasip2/wasip3 require clang 22 or later for `-fdefer-ts`")
+  message(FATAL_ERROR "wasip2/wasip3/webp2 require clang 22 or later for `-fdefer-ts`")
 endif()
 
 # =============================================================================

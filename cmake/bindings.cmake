@@ -38,7 +38,7 @@ endif()
 set(bottom_half "${CMAKE_SOURCE_DIR}/libc-bottom-half")
 
 add_custom_target(
-  bindings-p2
+  bindings-wasip2
   COMMAND
     ${wit_bindgen} c
       --autodrop-borrows yes
@@ -80,7 +80,7 @@ add_custom_target(
 )
 
 add_custom_target(
-  bindings-p3
+  bindings-wasip3
   COMMAND
     ${wit_bindgen} c
       --autodrop-borrows yes
@@ -138,7 +138,21 @@ add_custom_target(
   DEPENDS wit-bindgen wasip3-wits
 )
 
-add_custom_target(bindings DEPENDS bindings-p2 bindings-p3)
+add_custom_target(
+  bindings-webp2
+  COMMAND
+    ${wit_bindgen} c
+      --autodrop-borrows yes
+      --rename-world webp2
+      --type-section-suffix __wasi_libc
+      ${CMAKE_SOURCE_DIR}/web/p2/wit
+  COMMAND cmake -E copy webp2.h ${bottom_half}/headers/public/wasi/__generated_webp2.h
+  COMMAND cmake -E copy webp2_component_type.o ${bottom_half}/sources
+  COMMAND cmake -E copy webp2.c ${bottom_half}/sources
+  DEPENDS wit-bindgen
+)
+
+add_custom_target(bindings DEPENDS bindings-wasip2 bindings-wasip3 bindings-webp2)
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
   set(SED_INPLACE_ARGS -i '')
@@ -149,13 +163,14 @@ endif()
 function(wit_bindgen_edit p)
   add_custom_target(
     bindings-${p}-edit
-    COMMAND sed ${SED_INPLACE_ARGS} "'s_#include .wasi${p}\.h._#include \"wasi/wasi${p}.h\"_'" ${bottom_half}/sources/wasi${p}.c
-    COMMAND sed ${SED_INPLACE_ARGS} "s/extern void exit_exit/_Noreturn extern void exit_exit/" ${bottom_half}/headers/public/wasi/__generated_wasi${p}.h
-    COMMAND sed ${SED_INPLACE_ARGS} "s/extern void __wasm_import_exit_exit/_Noreturn extern void __wasm_import_exit_exit/" ${bottom_half}/sources/wasi${p}.c
+    COMMAND sed ${SED_INPLACE_ARGS} "'s_#include .${p}\.h._#include \"wasi/${p}.h\"_'" ${bottom_half}/sources/${p}.c
+    COMMAND sed ${SED_INPLACE_ARGS} "s/extern void exit_exit/_Noreturn extern void exit_exit/" ${bottom_half}/headers/public/wasi/__generated_${p}.h
+    COMMAND sed ${SED_INPLACE_ARGS} "s/extern void __wasm_import_exit_exit/_Noreturn extern void __wasm_import_exit_exit/" ${bottom_half}/sources/${p}.c
     DEPENDS bindings-${p}
   )
   add_dependencies(bindings bindings-${p}-edit)
 endfunction()
 
-wit_bindgen_edit(p2)
-wit_bindgen_edit(p3)
+wit_bindgen_edit(wasip2)
+wit_bindgen_edit(wasip3)
+wit_bindgen_edit(webp2)

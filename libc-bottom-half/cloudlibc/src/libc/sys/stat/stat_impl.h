@@ -65,7 +65,7 @@ static inline void to_public_stat(const __wasi_filestat_t *in,
        break;
    }
 }
-#elif defined(__wasip2__) || defined(__wasip3__)
+#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
 #ifdef __wasip3__
 typedef filesystem_instant_t filesystem_datetime_t;
 #endif

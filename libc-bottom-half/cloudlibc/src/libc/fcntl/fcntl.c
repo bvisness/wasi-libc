@@ -53,7 +53,7 @@ int fcntl(int fildes, int cmd, ...) {
         oflags |= O_SEARCH;
       }
       return oflags;
-#elif defined(__wasip2__) || defined(__wasip3__)
+#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
       if (!entry.vtable->fcntl_getfl) {
         errno = EINVAL;
         return -1;
@@ -78,7 +78,7 @@ int fcntl(int fildes, int cmd, ...) {
         errno = error;
         return -1;
       }
-#elif defined(__wasip2__) || defined(__wasip3__)
+#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
       if (!entry.vtable->fcntl_setfl) {
         errno = EINVAL;
         return -1;

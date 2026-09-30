@@ -1,6 +1,6 @@
 #include <wasi/api.h>
 
-#if defined(__wasip2__) || defined(__wasip3__)
+#if defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>

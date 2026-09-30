@@ -59,7 +59,7 @@ int ioctl(int fildes, int request, ...) {
       // No data available for reading.
       *result = 0;
       return 0;
-#elif defined(__wasip2__) || defined(__wasip3__)
+#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
       // wasip{2,3} doesn't support this operation
       errno = ENOTSUP;
       return -1;
@@ -93,7 +93,7 @@ int ioctl(int fildes, int request, ...) {
         return -1;
       }
       return 0;
-#elif defined(__wasip2__) || defined(__wasip3__) 
+#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
       descriptor_table_entry_t entry;
       if (descriptor_table_get(fildes, &entry) < 0)
         return -1;

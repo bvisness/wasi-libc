@@ -30,7 +30,7 @@ off_t __lseek(int fildes, off_t offset, int whence) {
     return -1;
   }
   return new_offset;
-#elif defined(__wasip2__) || defined(__wasip3__)
+#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
   // Look up a stream for fildes
   descriptor_table_entry_t entry;
   if (descriptor_table_get(fildes, &entry) < 0)

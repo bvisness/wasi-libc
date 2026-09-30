@@ -10,7 +10,7 @@
 noreturn void _Exit(int status) {
 #if defined(__wasip1__)
   __wasi_proc_exit(status);
-#elif defined(__wasip2__) || defined(__wasip3__)
+#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
   if (status >= 0 && status <= 255)
     exit_exit_with_code(status);
   exit_result_void_void_t exit_status = { .is_err = status != 0 };

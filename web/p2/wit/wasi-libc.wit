@@ -1,0 +1,3 @@
+package wasi-libc:webp2;
+
+world webp2 {}

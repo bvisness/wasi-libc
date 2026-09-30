@@ -31,6 +31,10 @@ if (NOT (WASI STREQUAL "p3"))
   list(REMOVE_ITEM globbed_headers headers/public/wasi/__generated_wasip3.h)
 endif()
 
+if (NOT (WEB STREQUAL "p2"))
+  list(REMOVE_ITEM globbed_headers headers/public/wasi/__generated_webp2.h)
+endif()
+
 foreach(header ${globbed_headers})
   string(REPLACE "headers/public/" "" dst ${header})
   add_sysroot_header(${header} ${dst})
@@ -51,36 +55,16 @@ endforeach()
 # building bottom-half sources
 #
 set(bottom_half_sources
-  cloudlibc/src/libc/dirent/closedir.c
-  cloudlibc/src/libc/dirent/dirfd.c
-  cloudlibc/src/libc/dirent/fdclosedir.c
-  cloudlibc/src/libc/dirent/fdopendir.c
-  cloudlibc/src/libc/dirent/opendirat.c
-  cloudlibc/src/libc/dirent/readdir.c
-  cloudlibc/src/libc/dirent/rewinddir.c
-  cloudlibc/src/libc/dirent/scandirat.c
-  cloudlibc/src/libc/dirent/seekdir.c
-  cloudlibc/src/libc/dirent/telldir.c
   cloudlibc/src/libc/errno/errno.c
   cloudlibc/src/libc/fcntl/fcntl.c
-  cloudlibc/src/libc/fcntl/openat.c
-  cloudlibc/src/libc/fcntl/posix_fadvise.c
-  cloudlibc/src/libc/fcntl/posix_fallocate.c
   cloudlibc/src/libc/poll/poll.c
   cloudlibc/src/libc/sched/sched_yield.c
-  cloudlibc/src/libc/stdio/renameat.c
   cloudlibc/src/libc/stdlib/_Exit.c
   cloudlibc/src/libc/sys/ioctl/ioctl.c
   cloudlibc/src/libc/sys/select/pselect.c
   cloudlibc/src/libc/sys/select/select.c
   cloudlibc/src/libc/sys/stat/fstat.c
-  cloudlibc/src/libc/sys/stat/fstatat.c
-  cloudlibc/src/libc/sys/stat/futimens.c
-  cloudlibc/src/libc/sys/stat/mkdirat.c
-  cloudlibc/src/libc/sys/stat/utimensat.c
   cloudlibc/src/libc/sys/time/gettimeofday.c
-  cloudlibc/src/libc/sys/uio/preadv.c
-  cloudlibc/src/libc/sys/uio/pwritev.c
   cloudlibc/src/libc/sys/uio/readv.c
   cloudlibc/src/libc/sys/uio/writev.c
   cloudlibc/src/libc/time/CLOCK_MONOTONIC.c
@@ -90,19 +74,11 @@ set(bottom_half_sources
   cloudlibc/src/libc/time/clock_nanosleep.c
   cloudlibc/src/libc/time/nanosleep.c
   cloudlibc/src/libc/time/time.c
-  cloudlibc/src/libc/unistd/faccessat.c
-  cloudlibc/src/libc/unistd/fdatasync.c
-  cloudlibc/src/libc/unistd/fsync.c
-  cloudlibc/src/libc/unistd/ftruncate.c
-  cloudlibc/src/libc/unistd/linkat.c
   cloudlibc/src/libc/unistd/lseek.c
   cloudlibc/src/libc/unistd/pread.c
   cloudlibc/src/libc/unistd/pwrite.c
   cloudlibc/src/libc/unistd/read.c
-  cloudlibc/src/libc/unistd/readlinkat.c
   cloudlibc/src/libc/unistd/sleep.c
-  cloudlibc/src/libc/unistd/symlinkat.c
-  cloudlibc/src/libc/unistd/unlinkat.c
   cloudlibc/src/libc/unistd/usleep.c
   cloudlibc/src/libc/unistd/write.c
   sources/__errno_location.c
@@ -113,30 +89,80 @@ set(bottom_half_sources
   sources/__wasilibc_initialize_environ.c
   sources/__wasilibc_random.c
   sources/__wasilibc_real.c
-  sources/__wasilibc_rmdirat.c
   sources/__wasilibc_tell.c
-  sources/__wasilibc_unlinkat.c
   sources/abort.c
-  sources/at_fdcwd.c
-  sources/chdir.c
   sources/complex-builtins.c
   sources/dup.c
   sources/environ.c
   sources/errno.c
-  sources/getcwd.c
   sources/getentropy.c
   sources/isatty.c
   sources/math/fmin-fmax.c
   sources/math/math-builtins.c
   sources/pipe.c
-  sources/posix.c
   sources/ppoll.c
-  sources/preopens.c
   sources/reallocarray.c
   sources/sbrk.c
-  sources/truncate.c
   sources/__cabi_realloc_wrapper.S
 )
+
+if (NOT WEB STREQUAL "p2")
+  list(APPEND bottom_half_sources
+    cloudlibc/src/libc/dirent/closedir.c
+    cloudlibc/src/libc/dirent/dirfd.c
+    cloudlibc/src/libc/dirent/fdclosedir.c
+    cloudlibc/src/libc/dirent/fdopendir.c
+    cloudlibc/src/libc/dirent/opendirat.c
+    cloudlibc/src/libc/dirent/readdir.c
+    cloudlibc/src/libc/dirent/rewinddir.c
+    cloudlibc/src/libc/dirent/scandirat.c
+    cloudlibc/src/libc/dirent/seekdir.c
+    cloudlibc/src/libc/dirent/telldir.c
+    cloudlibc/src/libc/fcntl/openat.c
+    cloudlibc/src/libc/fcntl/posix_fadvise.c
+    cloudlibc/src/libc/fcntl/posix_fallocate.c
+    cloudlibc/src/libc/stdio/renameat.c
+    cloudlibc/src/libc/sys/stat/fstatat.c
+    cloudlibc/src/libc/sys/stat/futimens.c
+    cloudlibc/src/libc/sys/stat/mkdirat.c
+    cloudlibc/src/libc/sys/stat/utimensat.c
+    cloudlibc/src/libc/sys/uio/preadv.c
+    cloudlibc/src/libc/sys/uio/pwritev.c
+    cloudlibc/src/libc/unistd/faccessat.c
+    cloudlibc/src/libc/unistd/fdatasync.c
+    cloudlibc/src/libc/unistd/fsync.c
+    cloudlibc/src/libc/unistd/ftruncate.c
+    cloudlibc/src/libc/unistd/linkat.c
+    cloudlibc/src/libc/unistd/readlinkat.c
+    cloudlibc/src/libc/unistd/symlinkat.c
+    cloudlibc/src/libc/unistd/unlinkat.c
+    sources/__wasilibc_rmdirat.c
+    sources/__wasilibc_unlinkat.c
+    sources/accept.c
+    sources/at_fdcwd.c
+    sources/bind.c
+    sources/chdir.c
+    sources/connect.c
+    sources/descriptor_table.c
+    sources/file.c
+    sources/file_utils.c
+    sources/getcwd.c
+    sources/getsockpeername.c
+    sources/listen.c
+    sources/netdb.c
+    sources/posix.c
+    sources/preopens.c
+    sources/recv.c
+    sources/send.c
+    sources/shutdown.c
+    sources/socket.c
+    sources/sockets_utils.c
+    sources/sockopt.c
+    sources/tcp.c
+    sources/truncate.c
+    sources/udp.c
+  )
+endif()
 
 if (WASI STREQUAL "p1")
   list(APPEND bottom_half_sources
@@ -145,26 +171,6 @@ if (WASI STREQUAL "p1")
     cloudlibc/src/libc/sys/socket/send.c
     cloudlibc/src/libc/sys/socket/shutdown.c
     sources/accept-wasip1.c
-  )
-else()
-  list(APPEND bottom_half_sources
-    sources/accept.c
-    sources/bind.c
-    sources/connect.c
-    sources/descriptor_table.c
-    sources/getsockpeername.c
-    sources/listen.c
-    sources/file_utils.c
-    sources/file.c
-    sources/recv.c
-    sources/send.c
-    sources/shutdown.c
-    sources/socket.c
-    sources/sockets_utils.c
-    sources/sockopt.c
-    sources/tcp.c
-    sources/udp.c
-    sources/netdb.c
   )
 endif()
 
@@ -180,6 +186,12 @@ if (WASI STREQUAL "p3")
     sources/wasip3.c
     sources/wasip3_block_on.c
     sources/wasip3_stdio.c
+  )
+endif()
+
+if (WEB STREQUAL "p2")
+  list(APPEND bottom_half_sources
+    sources/webp2.c
   )
 endif()
 
@@ -240,6 +252,9 @@ if (WASI STREQUAL "p1")
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_OBJECTS:crt1-command> ${crt_sysroot}/crt1-command.o
     DEPENDS crt1-command $<TARGET_OBJECTS:crt1-command>
   )
+elseif(WEB STREQUAL "p2")
+  # webp2: crt1-command.o is not necessary
+  # TODO(webp2): Set world like below?
 else()
   if (WASI STREQUAL "p2")
     set(world wasi:cli/command@${wasip2-version})
@@ -279,18 +294,21 @@ else()
   )
 endif()
 
-# Provide a plain crt1.o for toolchain compatibility, identical to
-# `crt1-command.c`
-add_custom_command(
-  OUTPUT ${crt_sysroot}/crt1.o
-  COMMAND ${CMAKE_COMMAND} -E copy ${crt_sysroot}/crt1-command.o ${crt_sysroot}/crt1.o
-  DEPENDS ${crt_sysroot}/crt1-command.o
-)
+set(startup_objects ${crt_sysroot}/crt1-reactor.o)
+if (NOT WEB STREQUAL "p2")
+  # Provide a plain crt1.o for toolchain compatibility, identical to
+  # `crt1-command.c`
+  add_custom_command(
+    OUTPUT ${crt_sysroot}/crt1.o
+    COMMAND ${CMAKE_COMMAND} -E copy ${crt_sysroot}/crt1-command.o ${crt_sysroot}/crt1.o
+    DEPENDS ${crt_sysroot}/crt1-command.o
+  )
 
-add_custom_target(sysroot-startup-objects
-  DEPENDS
-    ${crt_sysroot}/crt1-reactor.o
+  list(APPEND startup_objects
     ${crt_sysroot}/crt1-command.o
     ${crt_sysroot}/crt1.o
-)
+  )
+endif()
+
+add_custom_target(sysroot-startup-objects DEPENDS ${startup_objects})
 add_dependencies(sysroot sysroot-startup-objects)
