@@ -17,7 +17,7 @@ int __clock_gettime(clockid_t clock_id, struct timespec *tp) {
     return -1;
   }
   *tp = timestamp_to_timespec(ts);
-#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
+#elif defined(__wasip2__) || defined(__wasip3__)
   if (tp == NULL)
     return 0;
 
@@ -36,6 +36,8 @@ int __clock_gettime(clockid_t clock_id, struct timespec *tp) {
     errno = EINVAL;
     return -1; // wasip{2,3} only supports wall and monotonic clocks
   }
+#elif defined(__webp2__)
+# error "TODO(webp2)"
 #else
 # error "Unsupported WASI version"
 #endif
