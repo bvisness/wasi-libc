@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
 #include <wasi/api.h>
+#include <wasi/report-error.h>
 #include <_/cdefs.h>
 #include <stdnoreturn.h>
 #include <unistd.h>
@@ -10,11 +11,16 @@
 noreturn void _Exit(int status) {
 #if defined(__wasip1__)
   __wasi_proc_exit(status);
-#elif defined(__wasip2__) || defined(__wasip3__) || defined(__webp2__)
+#elif defined(__wasip2__) || defined(__wasip3__)
   if (status >= 0 && status <= 255)
     exit_exit_with_code(status);
   exit_result_void_void_t exit_status = { .is_err = status != 0 };
   exit_exit(&exit_status);
+#elif defined(__webp2__)
+  if (status != 0) {
+    __wasilibc_report_error("exit with nonzero status");
+    __builtin_trap();
+  }
 #else
 # error "Unknown WASI version"
 #endif

@@ -11,6 +11,9 @@ extern int32_t __wasm_import_webp2_get_performance(void);
 __attribute__((__import_module__("$root"), __import_name__("report-error")))
 extern void __wasm_import_webp2_report_error(int32_t);
 
+__attribute__((__import_module__("$root"), __import_name__("[get]crypto")))
+extern int32_t __wasm_import_webp2_get_crypto(void);
+
 __attribute__((__import_module__("$root"), __import_name__("[method]performance-impl.now")))
 extern double __wasm_import_webp2_method_performance_impl_now(int32_t);
 
@@ -22,6 +25,15 @@ extern double __wasm_import_webp2_static_date_now(void);
 
 __attribute__((__import_module__("$root"), __import_name__("[constructor]error")))
 extern int32_t __wasm_import_webp2_constructor_error(int32_t, uint8_t *, size_t, int32_t, int32_t, uint8_t *, size_t);
+
+__attribute__((__import_module__("$root"), __import_name__("[constructor]uint-8-array")))
+extern int32_t __wasm_import_webp2_constructor_uint_8_array(int32_t);
+
+__attribute__((__import_module__("$root"), __import_name__("[method]uint-8-array.subarray")))
+extern int32_t __wasm_import_webp2_method_uint_8_array_subarray(int32_t, int32_t, int32_t, int32_t);
+
+__attribute__((__import_module__("$root"), __import_name__("[method]crypto-impl.get-random-values")))
+extern void __wasm_import_webp2_method_crypto_impl_get_random_values(int32_t, int32_t, uint8_t *);
 
 // Canonical ABI intrinsics
 
@@ -79,9 +91,46 @@ webp2_borrow_error_t webp2_borrow_error(webp2_own_error_t arg) {
   return (webp2_borrow_error_t) { arg.__handle };
 }
 
+__attribute__((__import_module__("$root"), __import_name__("[resource-drop]uint-8-array")))
+extern void __wasm_import_webp2_uint_8_array_drop(int32_t handle);
+
+void webp2_uint_8_array_drop_own(webp2_own_uint_8_array_t handle) {
+  __wasm_import_webp2_uint_8_array_drop(handle.__handle);
+}
+
+webp2_borrow_uint_8_array_t webp2_borrow_uint_8_array(webp2_own_uint_8_array_t arg) {
+  return (webp2_borrow_uint_8_array_t) { arg.__handle };
+}
+
+__attribute__((__import_module__("$root"), __import_name__("[resource-drop]crypto-impl")))
+extern void __wasm_import_webp2_crypto_impl_drop(int32_t handle);
+
+void webp2_crypto_impl_drop_own(webp2_own_crypto_impl_t handle) {
+  __wasm_import_webp2_crypto_impl_drop(handle.__handle);
+}
+
+webp2_borrow_crypto_impl_t webp2_borrow_crypto_impl(webp2_own_crypto_impl_t arg) {
+  return (webp2_borrow_crypto_impl_t) { arg.__handle };
+}
+
 void webp2_option_new_error_options_free(webp2_option_new_error_options_t *ptr) {
   if (ptr->is_some) {
     webp2_new_error_options_free(&ptr->val);
+  }
+}
+
+void webp2_option_u32_free(webp2_option_u32_t *ptr) {
+  if (ptr->is_some) {
+  }
+}
+
+void webp2_list_u8_free(webp2_list_u8_t *ptr) {
+  size_t list_len = ptr->len;
+  if (list_len > 0) {
+    uint8_t *list_ptr = ptr->ptr;
+    for (size_t i = 0; i < list_len; i++) {
+    }
+    free(list_ptr);
   }
 }
 
@@ -119,6 +168,11 @@ webp2_own_performance_impl_t webp2_get_performance(void) {
 
 void webp2_report_error(webp2_borrow_error_t throwable) {
   __wasm_import_webp2_report_error((throwable).__handle);
+}
+
+webp2_own_crypto_impl_t webp2_get_crypto(void) {
+  int32_t ret = __wasm_import_webp2_get_crypto();
+  return (webp2_own_crypto_impl_t) { ret };
 }
 
 double webp2_method_performance_impl_now(webp2_borrow_performance_impl_t self) {
@@ -189,6 +243,38 @@ webp2_own_error_t webp2_constructor_error(webp2_string_t *maybe_message, webp2_n
   }
   int32_t ret = __wasm_import_webp2_constructor_error(option, option1, option2, option10, option11, option12, option13);
   return (webp2_own_error_t) { ret };
+}
+
+webp2_own_uint_8_array_t webp2_constructor_uint_8_array(uint32_t length) {
+  int32_t ret = __wasm_import_webp2_constructor_uint_8_array((int32_t) (length));
+  return (webp2_own_uint_8_array_t) { ret };
+}
+
+webp2_own_uint_8_array_t webp2_method_uint_8_array_subarray(webp2_borrow_uint_8_array_t self, uint32_t begin, uint32_t *maybe_end) {
+  webp2_option_u32_t end;
+  end.is_some = maybe_end != NULL;if (maybe_end) {
+    end.val = *maybe_end;
+  }
+  int32_t option;
+  int32_t option1;
+  if ((end).is_some) {
+    const uint32_t *payload0 = &(end).val;
+    option = 1;
+    option1 = (int32_t) (*payload0);
+  } else {
+    option = 0;
+    option1 = 0;
+  }
+  int32_t ret = __wasm_import_webp2_method_uint_8_array_subarray((self).__handle, (int32_t) (begin), option, option1);
+  return (webp2_own_uint_8_array_t) { ret };
+}
+
+void webp2_method_crypto_impl_get_random_values(webp2_borrow_crypto_impl_t self, webp2_borrow_uint_8_array_t typed_array, webp2_list_u8_t *ret) {
+  __attribute__((__aligned__(sizeof(void*))))
+  uint8_t ret_area[(2*sizeof(void*))];
+  uint8_t *ptr = (uint8_t *) &ret_area;
+  __wasm_import_webp2_method_crypto_impl_get_random_values((self).__handle, (typed_array).__handle, ptr);
+  *ret = (webp2_list_u8_t) { (uint8_t*)(*((uint8_t **) (ptr + 0))), (*((size_t*) (ptr + sizeof(void*)))) };
 }
 
 // Ensure that the *_component_type.o object is linked in

@@ -47,18 +47,58 @@ typedef struct webp2_borrow_error_t {
   int32_t __handle;
 } webp2_borrow_error_t;
 
+typedef struct webp2_own_uint_8_array_t {
+  int32_t __handle;
+} webp2_own_uint_8_array_t;
+
+typedef struct webp2_borrow_uint_8_array_t {
+  int32_t __handle;
+} webp2_borrow_uint_8_array_t;
+
+typedef struct webp2_own_crypto_impl_t {
+  int32_t __handle;
+} webp2_own_crypto_impl_t;
+
+typedef struct webp2_borrow_crypto_impl_t {
+  int32_t __handle;
+} webp2_borrow_crypto_impl_t;
+
 typedef struct {
   bool is_some;
   webp2_new_error_options_t val;
 } webp2_option_new_error_options_t;
 
+typedef struct {
+  bool is_some;
+  uint32_t val;
+} webp2_option_u32_t;
+
+typedef struct {
+  uint8_t *ptr;
+  size_t len;
+} webp2_list_u8_t;
+
 // Imported Functions from `webp2`
 extern webp2_own_performance_impl_t webp2_get_performance(void);
 extern void webp2_report_error(webp2_borrow_error_t throwable);
+extern webp2_own_crypto_impl_t webp2_get_crypto(void);
 extern double webp2_method_performance_impl_now(webp2_borrow_performance_impl_t self);
 extern double webp2_method_get_performance_impl_time_origin(webp2_borrow_performance_impl_t self);
 extern double webp2_static_date_now(void);
 extern webp2_own_error_t webp2_constructor_error(webp2_string_t *maybe_message, webp2_new_error_options_t *maybe_options);
+extern webp2_own_uint_8_array_t webp2_constructor_uint_8_array(uint32_t length);
+extern webp2_own_uint_8_array_t webp2_method_uint_8_array_subarray(webp2_borrow_uint_8_array_t self, uint32_t begin, uint32_t *maybe_end);
+// TODO(webp2): This is very jank, but basically, the whole design of
+// Crypto.getRandomValues() doesn't make sense for the component model
+// because it modifies its parameter in place. The component model has
+// no concept of an out-parameter (nor should it, frankly), but in this
+// case we have no choice but to uselessly copy an entire array for it
+// to fill "in place" and then copy back to us. By passing a handle to
+// a pre-existing Uint8Array we can at least avoid the first copy.
+// 
+// We desperately need to find a better way to do this. Some new
+// builtin? New web APIs?
+extern void webp2_method_crypto_impl_get_random_values(webp2_borrow_crypto_impl_t self, webp2_borrow_uint_8_array_t typed_array, webp2_list_u8_t *ret);
 
 // Helper Functions
 
@@ -78,7 +118,19 @@ extern void webp2_error_drop_own(webp2_own_error_t handle);
 
 extern webp2_borrow_error_t webp2_borrow_error(webp2_own_error_t handle);
 
+extern void webp2_uint_8_array_drop_own(webp2_own_uint_8_array_t handle);
+
+extern webp2_borrow_uint_8_array_t webp2_borrow_uint_8_array(webp2_own_uint_8_array_t handle);
+
+extern void webp2_crypto_impl_drop_own(webp2_own_crypto_impl_t handle);
+
+extern webp2_borrow_crypto_impl_t webp2_borrow_crypto_impl(webp2_own_crypto_impl_t handle);
+
 void webp2_option_new_error_options_free(webp2_option_new_error_options_t *ptr);
+
+void webp2_option_u32_free(webp2_option_u32_t *ptr);
+
+void webp2_list_u8_free(webp2_list_u8_t *ptr);
 
 // Sets the string `ret` to reference the input string `s` without copying it
 void webp2_string_set(webp2_string_t *ret, const char*s);
