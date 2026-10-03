@@ -4,7 +4,7 @@ world webp2 {
     resource performance {
         now: func() -> f64;
     }
-    performance: get() -> performance;
+    import performance: get() -> performance;
 
     resource date {
         now: static func() -> f64;

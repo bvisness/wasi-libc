@@ -15,8 +15,8 @@ if(WIT_BINDGEN_EXECUTABLE)
     OUTPUT_VARIABLE WIT_BINDGEN_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  if (NOT (WIT_BINDGEN_VERSION MATCHES "0\\.60\\.0"))
-    message(WARNING "wit-bindgen version 0.60.0 is required, found: ${WIT_BINDGEN_VERSION}")
+  if (NOT (WIT_BINDGEN_VERSION MATCHES "0\\.62\\.0"))
+    message(WARNING "wit-bindgen version 0.62.0 is required, found: ${WIT_BINDGEN_VERSION}")
     set(WIT_BINDGEN_EXECUTABLE "")
   endif()
 endif()
