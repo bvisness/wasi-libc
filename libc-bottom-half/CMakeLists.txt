@@ -54,19 +54,13 @@ endforeach()
 # =============================================================================
 # building bottom-half sources
 #
+
+# All targets
 set(bottom_half_sources
   cloudlibc/src/libc/errno/errno.c
-  cloudlibc/src/libc/fcntl/fcntl.c
-  cloudlibc/src/libc/poll/poll.c
   cloudlibc/src/libc/sched/sched_yield.c
   cloudlibc/src/libc/stdlib/_Exit.c
-  cloudlibc/src/libc/sys/ioctl/ioctl.c
-  cloudlibc/src/libc/sys/select/pselect.c
-  cloudlibc/src/libc/sys/select/select.c
-  cloudlibc/src/libc/sys/stat/fstat.c
   cloudlibc/src/libc/sys/time/gettimeofday.c
-  cloudlibc/src/libc/sys/uio/readv.c
-  cloudlibc/src/libc/sys/uio/writev.c
   cloudlibc/src/libc/time/CLOCK_MONOTONIC.c
   cloudlibc/src/libc/time/CLOCK_REALTIME.c
   cloudlibc/src/libc/time/clock_getres.c
@@ -74,40 +68,59 @@ set(bottom_half_sources
   cloudlibc/src/libc/time/clock_nanosleep.c
   cloudlibc/src/libc/time/nanosleep.c
   cloudlibc/src/libc/time/time.c
-  cloudlibc/src/libc/unistd/lseek.c
-  cloudlibc/src/libc/unistd/pread.c
-  cloudlibc/src/libc/unistd/pwrite.c
-  cloudlibc/src/libc/unistd/read.c
   cloudlibc/src/libc/unistd/sleep.c
   cloudlibc/src/libc/unistd/usleep.c
-  cloudlibc/src/libc/unistd/write.c
   sources/__errno_location.c
   sources/__main_void.c
   sources/__wasilibc_dt.c
   sources/__wasilibc_environ.c
-  sources/__wasilibc_fd_renumber.c
   sources/__wasilibc_initialize_environ.c
   sources/__wasilibc_random.c
   sources/__wasilibc_real.c
   sources/__wasilibc_report_error.c
   sources/__wasilibc_report_errorf.c
-  sources/__wasilibc_tell.c
   sources/abort.c
   sources/complex-builtins.c
-  sources/dup.c
   sources/environ.c
   sources/errno.c
   sources/getentropy.c
-  sources/isatty.c
   sources/math/fmin-fmax.c
   sources/math/math-builtins.c
-  sources/pipe.c
-  sources/ppoll.c
   sources/reallocarray.c
   sources/sbrk.c
   sources/__cabi_realloc_wrapper.S
 )
 
+# File descriptors
+if (NOT WEB STREQUAL "p2")
+  list(APPEND bottom_half_sources
+    cloudlibc/src/libc/fcntl/fcntl.c
+    cloudlibc/src/libc/poll/poll.c
+    cloudlibc/src/libc/sys/ioctl/ioctl.c
+    cloudlibc/src/libc/sys/select/pselect.c
+    cloudlibc/src/libc/sys/select/select.c
+    cloudlibc/src/libc/sys/stat/fstat.c
+    cloudlibc/src/libc/sys/uio/readv.c
+    cloudlibc/src/libc/sys/uio/writev.c
+    cloudlibc/src/libc/unistd/lseek.c
+    cloudlibc/src/libc/unistd/read.c
+    cloudlibc/src/libc/unistd/write.c
+    sources/__wasilibc_fd_renumber.c
+    sources/__wasilibc_tell.c
+    sources/dup.c
+    sources/isatty.c
+    sources/pipe.c
+    sources/ppoll.c
+  )
+  if (WASI STREQUAL "p2" OR WASI STREQUAL "p3")
+    list(APPEND bottom_half_sources
+      sources/descriptor_table.c
+      sources/file_utils.c
+    )
+  endif()
+endif()
+
+# Filesystem
 if (NOT WEB STREQUAL "p2")
   list(APPEND bottom_half_sources
     cloudlibc/src/libc/dirent/closedir.c
@@ -135,37 +148,28 @@ if (NOT WEB STREQUAL "p2")
     cloudlibc/src/libc/unistd/fsync.c
     cloudlibc/src/libc/unistd/ftruncate.c
     cloudlibc/src/libc/unistd/linkat.c
+    cloudlibc/src/libc/unistd/pread.c
+    cloudlibc/src/libc/unistd/pwrite.c
     cloudlibc/src/libc/unistd/readlinkat.c
     cloudlibc/src/libc/unistd/symlinkat.c
     cloudlibc/src/libc/unistd/unlinkat.c
     sources/__wasilibc_rmdirat.c
     sources/__wasilibc_unlinkat.c
-    sources/accept.c
     sources/at_fdcwd.c
-    sources/bind.c
     sources/chdir.c
-    sources/connect.c
-    sources/descriptor_table.c
-    sources/file.c
-    sources/file_utils.c
     sources/getcwd.c
-    sources/getsockpeername.c
-    sources/listen.c
-    sources/netdb.c
     sources/posix.c
     sources/preopens.c
-    sources/recv.c
-    sources/send.c
-    sources/shutdown.c
-    sources/socket.c
-    sources/sockets_utils.c
-    sources/sockopt.c
-    sources/tcp.c
     sources/truncate.c
-    sources/udp.c
   )
+  if (WASI STREQUAL "p2" OR WASI STREQUAL "p3")
+    list(APPEND bottom_half_sources
+      sources/file.c
+    )
+  endif()
 endif()
 
+# Sockets
 if (WASI STREQUAL "p1")
   list(APPEND bottom_half_sources
     cloudlibc/src/libc/sys/socket/getsockopt.c
@@ -174,8 +178,26 @@ if (WASI STREQUAL "p1")
     cloudlibc/src/libc/sys/socket/shutdown.c
     sources/accept-wasip1.c
   )
+elseif(WASI STREQUAL "p2" OR WASI STREQUAL "p3")
+  list(APPEND bottom_half_sources
+    sources/accept.c
+    sources/bind.c
+    sources/connect.c
+    sources/getsockpeername.c
+    sources/listen.c
+    sources/netdb.c
+    sources/recv.c
+    sources/send.c
+    sources/shutdown.c
+    sources/socket.c
+    sources/sockets_utils.c
+    sources/sockopt.c
+    sources/tcp.c
+    sources/udp.c
+  )
 endif()
 
+# wasip2-specific
 if(WASI STREQUAL "p2")
   list(APPEND bottom_half_sources
     sources/wasip2.c
@@ -183,23 +205,27 @@ if(WASI STREQUAL "p2")
   )
 endif()
 
+# wasip3-specific
 if (WASI STREQUAL "p3")
   list(APPEND bottom_half_sources
     sources/wasip3.c
     sources/wasip3_block_on.c
     sources/wasip3_stdio.c
   )
+  if (HAVE_WASM_LIBCALL_THREAD_CONTEXT)
+    list(APPEND bottom_half_sources sources/__wasm_task_hook.S
+      sources/wasip3_tls.c
+    )
+  endif()
 endif()
 
+
+# webp2-specific
 if (WEB STREQUAL "p2")
   list(APPEND bottom_half_sources
     sources/webp2.c
+    sources/webp2_filesystem.c
   )
-endif()
-
-if (HAVE_WASM_LIBCALL_THREAD_CONTEXT)
-  list(APPEND bottom_half_sources sources/__wasm_task_hook.S
-    sources/wasip3_tls.c)
 endif()
 
 # Don't export symbols of generated code in shared libraries, so specifically
