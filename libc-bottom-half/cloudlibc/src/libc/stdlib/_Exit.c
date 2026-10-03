@@ -19,8 +19,10 @@ noreturn void _Exit(int status) {
 #elif defined(__webp2__)
   if (status != 0) {
     __wasilibc_report_error("exit with nonzero status");
-    __builtin_trap();
   }
+  // We really don't have any other way to halt execution except to trap. Quite
+  // unfortunate that this will manifest as a RuntimeError.
+  __builtin_trap();
 #else
 # error "Unknown WASI version"
 #endif
