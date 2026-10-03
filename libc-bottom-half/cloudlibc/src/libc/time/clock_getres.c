@@ -39,6 +39,19 @@ int clock_getres(clockid_t clock_id, struct timespec *res) {
         return -1;
     }
   }
+#elif defined(__webp2__)
+  if (res != NULL) {
+    if (clock_id == CLOCK_REALTIME) {
+      // Date.now() is always limited to 1ms resolution.
+      *res = (struct timespec){ .tv_nsec = NSEC_PER_MSEC };
+    } else if (clock_id == CLOCK_MONOTONIC) {
+      // Performance.now() has up to five-microsecond precision.
+      *res = (struct timespec){ .tv_nsec = 5 * NSEC_PER_USEC };
+    } else {
+      errno = EINVAL; // webp2 only supports wall and monotonic clocks
+      return -1;
+    }
+  }
 #else
 # error "Unsupported WASI version"
 #endif

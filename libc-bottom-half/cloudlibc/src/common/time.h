@@ -9,12 +9,17 @@
 
 #include <sys/time.h>
 
+#include <math.h>
 #include <wasi/api.h>
 #include <stdbool.h>
 #include <time.h>
 
 #define NSEC_PER_SEC 1000000000
+#define NSEC_PER_MSEC 1000000
+#define NSEC_PER_USEC 1000
 #define USEC_PER_SEC 1000000
+#define USEC_PER_MSEC 1000
+#define MSEC_PER_SEC 1000
 
 #if defined(__wasip1__)
 typedef __wasi_timestamp_t wasilibc_timestamp_t;
@@ -28,8 +33,8 @@ typedef struct wasilibc_timestamp_t {
   uint64_t   seconds;
   uint32_t   nanoseconds;
 } wasilibc_timestamp_t;
-typedef uint64_t monotonic_clock_instant_t;
-typedef uint64_t monotonic_clock_duration_t;
+typedef uint64_t monotonic_clock_instant_t; // nanoseconds
+typedef uint64_t monotonic_clock_duration_t; // nanoseconds
 #else
 # error "Unknown WASI version"
 #endif
@@ -40,11 +45,11 @@ static inline bool timespec_to_timestamp_exact(
   if (timespec->tv_nsec < 0 || timespec->tv_nsec >= NSEC_PER_SEC)
     return false;
 
-  #if defined(__wasip1__) || defined(__wasip2__)
+#if defined(__wasip1__) || defined(__wasip2__) || defined(__webp2__)
   // Timestamps before the Epoch are not supported.
   if (timespec->tv_sec < 0)
     return false;
-  #endif
+#endif
 
 #if defined(__wasip1__)
   // Make sure our timestamp does not overflow.
@@ -116,10 +121,9 @@ static inline struct timespec timestamp_to_timespec(
   if (timestamp->seconds > INT64_MAX) {
     return (struct timespec){.tv_sec = INT64_MAX, .tv_nsec = NSEC_PER_SEC - 1};
   }
-#else
+#endif
   return (struct timespec){.tv_sec = timestamp->seconds,
                            .tv_nsec = timestamp->nanoseconds};
-#endif
 }
 
 static inline struct timespec instant_to_timespec(
@@ -190,4 +194,23 @@ static inline struct timeval timestamp_to_timeval(
 #else
 # error "Unknown WASI version"
 #endif
+
+#ifdef __webp2__
+static inline wasilibc_timestamp_t web_wall_clock_now() {
+  double clock_ms = webp2_static_date_now();
+  return (wasilibc_timestamp_t){
+    .seconds = (uint64_t)(clock_ms / MSEC_PER_SEC),
+    .nanoseconds = fmod(clock_ms, MSEC_PER_SEC) * NSEC_PER_MSEC,
+  };
+}
+
+static inline monotonic_clock_instant_t web_monotonic_clock_now() {
+  webp2_own_performance_impl_t perf = webp2_get_performance();
+  double time_origin = webp2_method_get_performance_impl_time_origin(webp2_borrow_performance_impl(perf));
+  double clock_ms = time_origin + webp2_method_performance_impl_now(webp2_borrow_performance_impl(perf));
+  webp2_performance_impl_drop_own(perf);
+  return (monotonic_clock_instant_t)(clock_ms * NSEC_PER_MSEC);
+}
+#endif
+
 #endif

@@ -4,6 +4,7 @@
 
 #include <common/clock.h>
 #include <common/time.h>
+#include <math.h>
 #include <wasi/api.h>
 #include <errno.h>
 #include <time.h>
@@ -37,7 +38,19 @@ int __clock_gettime(clockid_t clock_id, struct timespec *tp) {
     return -1; // wasip{2,3} only supports wall and monotonic clocks
   }
 #elif defined(__webp2__)
-# error "TODO(webp2)"
+  if (tp == NULL) {
+    return 0;
+  }
+
+  if (clock_id->id == CLOCKID_MONOTONIC) {
+    *tp = instant_to_timespec(web_monotonic_clock_now());
+  } else if (clock_id->id == CLOCKID_REALTIME) {
+    wasilibc_timestamp_t now = web_wall_clock_now();
+    *tp = timestamp_to_timespec(&now);
+  } else {
+    errno = EINVAL;
+    return -1;
+  }
 #else
 # error "Unsupported WASI version"
 #endif

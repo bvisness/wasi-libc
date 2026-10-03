@@ -1,12 +1,22 @@
 package wasi-libc:webp2;
 
 world webp2 {
-    resource performance {
+    @external-id("Performance")
+    resource performance-impl {
         now: func() -> f64;
+        time-origin: get() -> f64;
     }
-    import performance: get() -> performance;
+    import performance: get() -> performance-impl;
 
     resource date {
         now: static func() -> f64;
     }
+
+    record new-error-options {
+        cause: option<string>, // TODO(webp2): cause -> option<JS-value>
+    }
+    resource error {
+        constructor(message: option<string>, options: option<new-error-options>); // TODO(webp2): message -> option<JS-value>
+    }
+    import report-error: func(throwable: borrow<error>);
 }
