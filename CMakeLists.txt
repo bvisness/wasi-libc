@@ -210,6 +210,12 @@ add_link_options(
   -resource-dir ${tmp_resource_dir}
 )
 
+if(__webp2__)
+  # TODO(webp2): Manually instruct clang to look at our new webp2 sysroot until
+  # it has been patched in wasi-sdk to know about "webp2" as an OS.
+  add_link_options(-B${SYSROOT_LIB} -L${SYSROOT_LIB})
+endif()
+
 # Expose the public headers to the implementation. We use `-isystem` for
 # purpose for two reasons:
 #
