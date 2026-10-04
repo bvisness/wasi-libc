@@ -222,8 +222,14 @@ endif()
 
 # webp2-specific
 if (WEB STREQUAL "p2")
+  set_source_files_properties(
+    sources/webp2_file_descriptors.c
+    sources/webp2_filesystem.c
+    PROPERTIES COMPILE_OPTIONS -Wno-unused-parameter
+  )
   list(APPEND bottom_half_sources
     sources/webp2.c
+    sources/webp2_file_descriptors.c
     sources/webp2_filesystem.c
   )
 endif()

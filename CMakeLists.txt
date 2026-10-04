@@ -384,6 +384,8 @@ if (WASI STREQUAL "p2")
   set(libc_extra_objects libc-bottom-half/sources/wasip2_component_type.o)
 elseif (WASI STREQUAL "p3")
   set(libc_extra_objects libc-bottom-half/sources/wasip3_component_type.o)
+elseif (WEB STREQUAL "p2")
+  set(libc_extra_objects libc-bottom-half/sources/webp2_component_type.o)
 endif()
 
 add_library(c SHARED EXCLUDE_FROM_ALL
