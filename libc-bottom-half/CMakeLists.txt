@@ -259,8 +259,13 @@ endforeach()
 # Clang will link by default based on compiler flags. These are compiled into
 # "object libraries" with CMake and then they're copied into the final location
 # with adjustments based on WASI versions.
-foreach(file crt/crt1-command.c
-             crt/crt1-reactor.c)
+
+set(crt_sources crt/crt1-reactor.c)
+if (NOT WEB STREQUAL "p2")
+  list(APPEND crt_sources crt/crt1-command.c)
+endif()
+
+foreach(file ${crt_sources})
   cmake_path(GET file STEM stem)
   add_library(${stem} OBJECT ${file})
   clang_format_target(${stem})

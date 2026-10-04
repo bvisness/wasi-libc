@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <wasi/poll.h>
 
+#ifndef __webp2__
 #ifdef __wasip3__
 
 #include "lock.h"
@@ -364,5 +365,6 @@ void __wasilibc_assert_no_descriptor_leaks(void);
 #endif
 
 #endif // __wasip1__
+#endif // __webp2__
 
 #endif // DESCRIPTOR_TABLE_H

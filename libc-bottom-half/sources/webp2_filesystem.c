@@ -37,6 +37,10 @@ DIR *opendir(const char *dirname) {
     WEBP2_UNSUPPORTED("opendir");
 }
 
+ssize_t pread(int fildes, void *buf, size_t nbyte, off_t offset) {
+    WEBP2_UNSUPPORTED("pread");
+}
+
 struct dirent *readdir(DIR *dirp) {
     WEBP2_UNSUPPORTED("readdir");
 }
