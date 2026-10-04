@@ -116,6 +116,18 @@ __attribute__((__weak__, nodebug)) int __main_void(void) {
 
   // Call `__main_argc_argv` with the arguments!
   return __main_argc_argv(argc, argv);
+#elif defined(__webp2__)
+  // TODO(webp2): I think what we actually want is some kind of reactor-ish but
+  // not quite reactor model, where a main function will be registered as a
+  // component start function but called with no arguments. This is analogous
+  // to the arbitrary side effect code that runs when you import a JS module.
+  // Core wasm start functions are almost certainly not what you want for many
+  // reasons, but particularly the lack of any ability to, you know, call out
+  // to the host. That will require component start functions to be somewhat
+  // more standardized than they are, which unfortunately might require more
+  // standardization of value imports/exports.
+  static char* argv[] = { NULL };
+  return __main_argc_argv(0, argv);
 #else
 #error "Unknown WASI version"
 #endif
