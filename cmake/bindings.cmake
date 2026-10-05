@@ -26,7 +26,7 @@ if (NOT WIT_BINDGEN_EXECUTABLE)
   ba_download(
     wit-bindgen
     "https://github.com/bytecodealliance/wit-bindgen"
-    "0.60.0"
+    "0.62.0"
   )
   ExternalProject_Get_Property(wit-bindgen SOURCE_DIR)
   set(wit_bindgen "${SOURCE_DIR}/wit-bindgen")

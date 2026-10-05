@@ -126,7 +126,7 @@ __attribute__((__weak__, nodebug)) int __main_void(void) {
   // to the host. That will require component start functions to be somewhat
   // more standardized than they are, which unfortunately might require more
   // standardization of value imports/exports.
-  static char* argv[] = { NULL };
+  static char *argv[] = {NULL};
   return __main_argc_argv(0, argv);
 #else
 #error "Unknown WASI version"

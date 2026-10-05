@@ -23,10 +23,10 @@ int __wasilibc_random(void *buffer, size_t len) {
 #if defined(__wasip2__) || defined(__wasip3__)
   // Set up a WASI byte list to receive the results
   list_u8_t wasi_list;
-  
+
   // Get random bytes
   random_get_random_bytes(len, &wasi_list);
-  
+
   // The spec for get-random-bytes specifies that wasi_list.len
   // will be equal to len.
   if (wasi_list.len != len)
@@ -53,23 +53,18 @@ int __wasilibc_random(void *buffer, size_t len) {
       // "Resize" the input array.
       uint32_t remaining32 = remaining;
       webp2_own_uint_8_array_t arr2 = webp2_method_uint_8_array_subarray(
-        webp2_borrow_uint_8_array(arr),
-        0, &remaining32
-      );
+          webp2_borrow_uint_8_array(arr), 0, &remaining32);
       webp2_uint_8_array_drop_own(arr);
       arr = arr2;
     }
 
     webp2_list_u8_t ret;
     webp2_method_crypto_impl_get_random_values(
-      webp2_borrow_crypto_impl(crypto),
-      webp2_borrow_uint_8_array(arr),
-      &ret
-    );
+        webp2_borrow_crypto_impl(crypto), webp2_borrow_uint_8_array(arr), &ret);
     if (ret.len != (remaining < MAX_CHUNK_SIZE ? remaining : MAX_CHUNK_SIZE)) {
       _Exit(EX_OSERR);
     }
-    memcpy((char*)buffer + done, ret.ptr, ret.len);
+    memcpy((char *)buffer + done, ret.ptr, ret.len);
     done += ret.len;
     webp2_list_u8_free(&ret);
   }
@@ -77,7 +72,7 @@ int __wasilibc_random(void *buffer, size_t len) {
   webp2_uint_8_array_drop_own(arr);
   webp2_crypto_impl_drop_own(crypto);
 #else
-# error "Unknown WASI version"
+#error "Unknown WASI version"
 #endif
 
   return 0;

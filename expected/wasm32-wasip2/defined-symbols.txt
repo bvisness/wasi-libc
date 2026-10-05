@@ -357,6 +357,8 @@ __wasilibc_random
 __wasilibc_read
 __wasilibc_rename_newat
 __wasilibc_rename_oldat
+__wasilibc_report_error
+__wasilibc_report_errorf
 __wasilibc_reset_preopens
 __wasilibc_rmdirat
 __wasilibc_setsockopt_timeout

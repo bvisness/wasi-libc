@@ -6,7 +6,7 @@
 #if defined(__webp2__)
 // Ensure we have well-formed UTF-8 in case of truncation. Assumes valid UTF-8
 // coming in.
-static void fix_truncated_utf8(char* buf, size_t len) {
+static void fix_truncated_utf8(char *buf, size_t len) {
   if (len == 0) {
     return;
   }
