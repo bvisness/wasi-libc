@@ -240,6 +240,8 @@ set_source_files_properties(sources/wasip2.c PROPERTIES
   COMPILE_OPTIONS -fvisibility=hidden)
 set_source_files_properties(sources/wasip3.c PROPERTIES
   COMPILE_OPTIONS -fvisibility=hidden)
+set_source_files_properties(sources/webp2.c PROPERTIES
+  COMPILE_OPTIONS -fvisibility=hidden)
 
 add_object_library(bottom-half ${bottom_half_sources})
 foreach(obj bottom-half-shared bottom-half-static)
