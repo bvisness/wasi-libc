@@ -20,8 +20,20 @@ int close(int fd) {
     WEBP2_UNSUPPORTED("close");
 }
 
+int dup3(int fd, int newfd, int flags) {
+    WEBP2_UNSUPPORTED("dup3");
+}
+
 int fcntl(int fildes, int cmd, ...) {
     WEBP2_UNSUPPORTED("fcntl");
+}
+
+int isatty(int fd) {
+    WEBP2_UNSUPPORTED("isatty");
+}
+
+off_t lseek(int fildes, off_t offset, int whence) {
+    WEBP2_UNSUPPORTED("lseek");
 }
 
 ssize_t read(int fildes, void *buf, size_t nbyte) {
