@@ -32,10 +32,14 @@ if (NOT (WASI STREQUAL "p3"))
 endif()
 
 if (WEB STREQUAL "p2")
-  # Just remove some headers that contain only __wasilibc filesystem utility
-  # functions so that we don't have to stub them all out.
+  # Remove some headers that are unnecessary for webp2, either because their
+  # contents are completely ifdef'd out or because they contain only internal
+  # utility functions we would otherwise need to stub.
   list(REMOVE_ITEM globbed_headers headers/public/wasi/libc-find-relpath.h)
   list(REMOVE_ITEM globbed_headers headers/public/wasi/libc-nocwd.h)
+  list(REMOVE_ITEM globbed_headers headers/public/wasi/wasip1.h)
+  list(REMOVE_ITEM globbed_headers headers/public/wasi/wasip2.h)
+  list(REMOVE_ITEM globbed_headers headers/public/wasi/wasip3.h)
 else ()
   list(REMOVE_ITEM globbed_headers headers/public/wasi/__generated_webp2.h)
 endif()

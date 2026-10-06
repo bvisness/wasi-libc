@@ -16,7 +16,10 @@
 #include <wasi/api.h>
 #include "lock.h"
 #include <wasi/version.h>
+
+#ifdef __wasip3__
 #include <wasi/wasip3_tls.h>
+#endif
 
 DECLARE_WEAK_LOCK(__thread_list_lock);
 
