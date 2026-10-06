@@ -148,6 +148,14 @@ jobs:
             test: true
             args: -DCMAKE_BUILD_TYPE=Debug -DTARGET_TRIPLE=wasm32-wasip3 -DENABLE_COOP_THREADS=ON
 
+          - name: Test wasm32-webp2
+            os: ubuntu-24.04
+            clang_version: 22
+            upload: wasm32-webp2
+            # TODO(webp2): Enable tests once there is a way to run them.
+            test: false
+            args: -DTARGET_TRIPLE=wasm32-webp2
+
           - name: Test emmalloc
             os: ubuntu-24.04
             clang_version: 20
@@ -258,6 +266,8 @@ jobs:
     - run: cmake -S . -B build -DTARGET_TRIPLE=wasm32-wasip2
     - run: ninja -C build format-check
     - run: cmake -S . -B build -DTARGET_TRIPLE=wasm32-wasip3
+    - run: ninja -C build format-check
+    - run: cmake -S . -B build -DTARGET_TRIPLE=wasm32-webp2
     - run: ninja -C build format-check
 
   rustfmt:
