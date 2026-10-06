@@ -70,11 +70,7 @@ set(bottom_half_sources
   cloudlibc/src/libc/time/CLOCK_REALTIME.c
   cloudlibc/src/libc/time/clock_getres.c
   cloudlibc/src/libc/time/clock_gettime.c
-  cloudlibc/src/libc/time/clock_nanosleep.c
-  cloudlibc/src/libc/time/nanosleep.c
   cloudlibc/src/libc/time/time.c
-  cloudlibc/src/libc/unistd/sleep.c
-  cloudlibc/src/libc/unistd/usleep.c
   sources/__errno_location.c
   sources/__main_void.c
   sources/__wasilibc_dt.c
@@ -202,6 +198,16 @@ elseif(WASI STREQUAL "p2" OR WASI STREQUAL "p3")
   )
 endif()
 
+# Sleep
+if (NOT (WEB STREQUAL "p2"))
+  list(APPEND bottom_half_sources
+    cloudlibc/src/libc/time/clock_nanosleep.c
+    cloudlibc/src/libc/time/nanosleep.c
+    cloudlibc/src/libc/unistd/sleep.c
+    cloudlibc/src/libc/unistd/usleep.c
+  )
+endif()
+
 # wasip2-specific
 if(WASI STREQUAL "p2")
   list(APPEND bottom_half_sources
@@ -230,6 +236,7 @@ if (WEB STREQUAL "p2")
   set_source_files_properties(
     sources/webp2_file_descriptors.c
     sources/webp2_filesystem.c
+    sources/webp2_sleep.c
     sources/webp2_socket.c
     PROPERTIES COMPILE_OPTIONS -Wno-unused-parameter
   )
@@ -237,6 +244,7 @@ if (WEB STREQUAL "p2")
     sources/webp2.c
     sources/webp2_file_descriptors.c
     sources/webp2_filesystem.c
+    sources/webp2_sleep.c
     sources/webp2_socket.c
   )
 endif()

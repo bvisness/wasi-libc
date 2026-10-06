@@ -66,13 +66,6 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp,
   }
 #endif
   return 0;
-
-#elif defined(__webp2__)
-  // TODO(webp2): Rather than return ENOTSUP, I figure I'd rather trap right
-  // now so we encounter issues more noisily.
-  __builtin_trap();
-  (void)clock_id;
-  (void)rqtp;
 #else
 # error "Unsupported WASI version"
 #endif
