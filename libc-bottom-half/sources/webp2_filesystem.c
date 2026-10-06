@@ -2,11 +2,20 @@
 
 #include "__struct_stat.h"
 #include <__typedef_DIR.h>
+#include <wasi/libc.h>
 #include "dirent.h"
 #include "wasi/report-error.h"
 
 int __wasilibc_open_nomode(const char *path, int oflag) {
     WEBP2_UNSUPPORTED("__wasilibc_open_nomode");
+}
+
+void __wasilibc_populate_preopens(void) {
+    WEBP2_UNSUPPORTED("__wasilibc_populate_preopens");
+}
+
+void __wasilibc_reset_preopens(void) {
+    WEBP2_UNSUPPORTED("__wasilibc_reset_preopens");
 }
 
 int closedir(DIR *dirp) {

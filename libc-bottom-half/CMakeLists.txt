@@ -31,7 +31,12 @@ if (NOT (WASI STREQUAL "p3"))
   list(REMOVE_ITEM globbed_headers headers/public/wasi/__generated_wasip3.h)
 endif()
 
-if (NOT (WEB STREQUAL "p2"))
+if (WEB STREQUAL "p2")
+  # Just remove some headers that contain only __wasilibc filesystem utility
+  # functions so that we don't have to stub them all out.
+  list(REMOVE_ITEM globbed_headers headers/public/wasi/libc-find-relpath.h)
+  list(REMOVE_ITEM globbed_headers headers/public/wasi/libc-nocwd.h)
+else ()
   list(REMOVE_ITEM globbed_headers headers/public/wasi/__generated_webp2.h)
 endif()
 
