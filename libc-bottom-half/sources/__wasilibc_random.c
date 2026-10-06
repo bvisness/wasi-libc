@@ -19,6 +19,8 @@ typedef wasip3_list_u8_t list_u8_t;
 #error "Unknown WASI version"
 #endif
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 int __wasilibc_random(void *buffer, size_t len) {
 #if defined(__wasip2__) || defined(__wasip3__)
   // Set up a WASI byte list to receive the results
@@ -46,10 +48,11 @@ int __wasilibc_random(void *buffer, size_t len) {
   // is obviously extremely jank, and doesn't avoid the obvious extra copy
   // (host -> ret -> buffer). But at least we reduce allocation and don't copy
   // the param.
-  webp2_own_uint_8_array_t arr = webp2_constructor_uint_8_array(MAX_CHUNK_SIZE);
+  uint32_t initial_alloc = (uint32_t)MIN(len, MAX_CHUNK_SIZE);
+  webp2_own_uint_8_array_t arr = webp2_constructor_uint_8_array(initial_alloc);
   for (size_t done = 0; done < len;) {
     size_t remaining = len - done;
-    if (remaining < MAX_CHUNK_SIZE) {
+    if (remaining < initial_alloc) {
       // "Resize" the input array.
       uint32_t remaining32 = remaining;
       webp2_own_uint_8_array_t arr2 = webp2_method_uint_8_array_subarray(
