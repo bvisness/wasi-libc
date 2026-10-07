@@ -1,12 +1,12 @@
 package wasi-libc:webp2;
 
 world webp2 {
-    @external-id("Performance")
-    resource performance-impl {
+    resource performance {
         now: func() -> f64;
         time-origin: get() -> f64;
     }
-    import performance: get() -> performance-impl;
+    @external-id("performance")
+    import global-performance: get() -> performance;
 
     resource date {
         now: static func() -> f64;
@@ -25,8 +25,7 @@ world webp2 {
         subarray: func(begin: u32, end: option<u32>) -> uint-8-array;
     }
 
-    @external-id("Crypto")
-    resource crypto-impl {
+    resource crypto {
         // TODO(webp2): This is very jank, but basically, the whole design of
         // Crypto.getRandomValues() doesn't make sense for the component model
         // because it modifies its parameter in place. The component model has
@@ -39,5 +38,6 @@ world webp2 {
         // builtin? New web APIs?
         get-random-values: func(typed-array: borrow<uint-8-array>) -> list<u8>;
     }
-    import crypto: get() -> crypto-impl;
+    @external-id("crypto")
+    import global-crypto: get() -> crypto;
 }

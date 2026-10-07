@@ -41,7 +41,7 @@ int __wasilibc_random(void *buffer, size_t len) {
   // Free the WASI byte list
   list_u8_free(&wasi_list);
 #elif defined(__webp2__)
-  webp2_own_crypto_impl_t crypto = webp2_get_crypto();
+  webp2_own_crypto_t crypto = webp2_get_global_crypto();
   const size_t MAX_CHUNK_SIZE = 65536;
 
   // Attempt to reduce copies by repeatedly reusing the same Uint8Array. This
@@ -62,8 +62,8 @@ int __wasilibc_random(void *buffer, size_t len) {
     }
 
     webp2_list_u8_t ret;
-    webp2_method_crypto_impl_get_random_values(
-        webp2_borrow_crypto_impl(crypto), webp2_borrow_uint_8_array(arr), &ret);
+    webp2_method_crypto_get_random_values(
+        webp2_borrow_crypto(crypto), webp2_borrow_uint_8_array(arr), &ret);
     if (ret.len != (remaining < MAX_CHUNK_SIZE ? remaining : MAX_CHUNK_SIZE)) {
       _Exit(EX_OSERR);
     }
@@ -73,7 +73,7 @@ int __wasilibc_random(void *buffer, size_t len) {
   }
 
   webp2_uint_8_array_drop_own(arr);
-  webp2_crypto_impl_drop_own(crypto);
+  webp2_crypto_drop_own(crypto);
 #else
 #error "Unknown WASI version"
 #endif

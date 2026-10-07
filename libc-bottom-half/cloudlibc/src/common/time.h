@@ -205,10 +205,10 @@ static inline wasilibc_timestamp_t web_wall_clock_now() {
 }
 
 static inline monotonic_clock_instant_t web_monotonic_clock_now() {
-  webp2_own_performance_impl_t perf = webp2_get_performance();
-  double time_origin = webp2_method_get_performance_impl_time_origin(webp2_borrow_performance_impl(perf));
-  double clock_ms = time_origin + webp2_method_performance_impl_now(webp2_borrow_performance_impl(perf));
-  webp2_performance_impl_drop_own(perf);
+  webp2_own_performance_t perf = webp2_get_global_performance();
+  double time_origin = webp2_method_get_performance_time_origin(webp2_borrow_performance(perf));
+  double clock_ms = time_origin + webp2_method_performance_now(webp2_borrow_performance(perf));
+  webp2_performance_drop_own(perf);
   return (monotonic_clock_instant_t)(clock_ms * NSEC_PER_MSEC);
 }
 #endif
