@@ -62,8 +62,8 @@ int __wasilibc_random(void *buffer, size_t len) {
     }
 
     webp2_list_u8_t ret;
-    webp2_method_crypto_get_random_values(
-        webp2_borrow_crypto(crypto), webp2_borrow_uint_8_array(arr), &ret);
+    webp2_method_crypto_get_random_values(webp2_borrow_crypto(crypto),
+                                          webp2_borrow_uint_8_array(arr), &ret);
     if (ret.len != (remaining < MAX_CHUNK_SIZE ? remaining : MAX_CHUNK_SIZE)) {
       _Exit(EX_OSERR);
     }
