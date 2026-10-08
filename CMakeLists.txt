@@ -12,8 +12,17 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type to use" FORCE)
 endif()
 
-# Force a cross-compile to WASI at all times.
-set(CMAKE_SYSTEM_NAME WASI)
+set(TARGET_TRIPLE "wasm32-wasip1" CACHE STRING "WASI target to test")
+set(CMAKE_C_COMPILER_TARGET ${TARGET_TRIPLE})
+
+# Force a cross-compile to WASI or WEB at all times.
+if(TARGET_TRIPLE MATCHES "-wasi")
+  set(CMAKE_SYSTEM_NAME WASI)
+elseif(TARGET_TRIPLE MATCHES "-web")
+  set(CMAKE_SYSTEM_NAME WEB)
+else()
+  message(FATAL_ERROR "Unknown target triple: ${TARGET_TRIPLE}")
+endif()
 
 # I'm not entirely sure why this is necessary on Windows. This may be a bug in
 # CMake, I'm not sure. The problem is that, at least on CI, CMake detects that
@@ -25,9 +34,6 @@ set(CMAKE_SYSTEM_NAME WASI)
 if (CMAKE_HOST_WIN32)
   set(CMAKE_INCLUDE_SYSTEM_FLAG_C "-isystem ")
 endif()
-
-set(TARGET_TRIPLE "wasm32-wasip1" CACHE STRING "WASI target to test")
-set(CMAKE_C_COMPILER_TARGET ${TARGET_TRIPLE})
 
 # We're building libc, and the compiler being used may not have a wasm sysroot
 # for libc, so skip this check. Otherwise the `project` call below attempts a
