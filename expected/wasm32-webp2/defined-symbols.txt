@@ -332,6 +332,7 @@ __wasilibc_stat
 __wasilibc_tell
 __wasilibc_unlinkat
 __wasilibc_utimens
+__wasilibc_webp2_report_error
 __wasm_call_dtors
 __wcscoll_l
 __wcsftime_l
