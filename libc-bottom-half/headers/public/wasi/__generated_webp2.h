@@ -78,14 +78,13 @@ typedef struct {
   size_t len;
 } webp2_list_u8_t;
 
-// Imported Functions from `webp2`
-extern webp2_own_performance_t webp2_get_global_performance(void);
-extern void webp2_report_error(webp2_borrow_error_t throwable);
-extern webp2_own_crypto_t webp2_get_global_crypto(void);
+// Imported Functions from `wasm:js/global`
 extern double webp2_method_performance_now(webp2_borrow_performance_t self);
 extern double webp2_method_get_performance_time_origin(webp2_borrow_performance_t self);
+extern webp2_own_performance_t webp2_get_global_performance(void);
 extern double webp2_static_date_now(void);
 extern webp2_own_error_t webp2_constructor_error(webp2_string_t *maybe_message, webp2_new_error_options_t *maybe_options);
+extern void webp2_report_error(webp2_borrow_error_t throwable);
 extern webp2_own_uint_8_array_t webp2_constructor_uint_8_array(uint32_t length);
 extern webp2_own_uint_8_array_t webp2_method_uint_8_array_subarray(webp2_borrow_uint_8_array_t self, uint32_t begin, uint32_t *maybe_end);
 // TODO(webp2): This is very jank, but basically, the whole design of
@@ -99,6 +98,7 @@ extern webp2_own_uint_8_array_t webp2_method_uint_8_array_subarray(webp2_borrow_
 // We desperately need to find a better way to do this. Some new
 // builtin? New web APIs?
 extern void webp2_method_crypto_get_random_values(webp2_borrow_crypto_t self, webp2_borrow_uint_8_array_t typed_array, webp2_list_u8_t *ret);
+extern webp2_own_crypto_t webp2_get_global_crypto(void);
 
 // Helper Functions
 

@@ -143,6 +143,7 @@ add_custom_target(
   COMMAND
     ${wit_bindgen} c
       --autodrop-borrows yes
+      --rename wasm:js/global=webp2
       --rename-world webp2
       --type-section-suffix __wasi_libc
       ${CMAKE_SOURCE_DIR}/web/p2/wit
