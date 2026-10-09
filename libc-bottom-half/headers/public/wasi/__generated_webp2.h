@@ -100,6 +100,9 @@ extern webp2_own_uint_8_array_t webp2_method_uint_8_array_subarray(webp2_borrow_
 extern void webp2_method_crypto_get_random_values(webp2_borrow_crypto_t self, webp2_borrow_uint_8_array_t typed_array, webp2_list_u8_t *ret);
 extern webp2_own_crypto_t webp2_get_global_crypto(void);
 
+// Imported Functions from `wasm:js/console`
+extern void webp2_console_log(webp2_string_t *msg);
+
 // Helper Functions
 
 extern void webp2_performance_drop_own(webp2_own_performance_t handle);

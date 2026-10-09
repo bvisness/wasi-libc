@@ -1,28 +1,178 @@
-// All things file-descriptory are stubbed out on the web, since there is no
-// comparable model of files and streams.
+// File descriptors are mostly stubbed out on the web, since there is no
+// comparable model of files and streams. However, stdout and stderr are
+// supported by routing to console.log, and stdin is supported by immediately
+// returning EOF.
 
+#include "features.h"
 #include "sys/uio.h"
 #include "wasi/report-error.h"
+#include <__errno_values.h>
+#include <errno.h>
+#include <limits.h>
 #include <poll.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <wasi/__generated_webp2.h>
 
 // unistd.h defines an `lseek` macro that would mangle the definition below.
 #undef lseek
 
-int __dup3(int fd, int newfd, int flags) { WEBP2_UNSUPPORTED("dup3"); }
+// ============================================================================
+// Basic stdio implementation
 
-int __isatty(int fd) { WEBP2_UNSUPPORTED("isatty"); }
+#define LINE_BUF_SIZE 128 // TODO(webp2): Increase size
+
+typedef struct line_buffer_t {
+  size_t len;
+  uint8_t buf[LINE_BUF_SIZE];
+} line_buffer_t;
+
+static line_buffer_t line_buffers[2];
+
+static bool fd_closed[3];
+
+static void flush_line_buffer(line_buffer_t* buf) {
+  webp2_string_t out = (webp2_string_t){ .ptr = buf->buf, .len = buf->len };
+  webp2_console_log(&out);
+  buf->len = 0;
+}
+
+static bool iovecs_ok(const struct iovec *iov, int iovcnt, size_t *total_size) {
+  // Check if the total size of all iovecs would overflow an ssize_t
+  *total_size = 0;
+  for (int i = 0; i < iovcnt; i++) {
+    const struct iovec* v = &iov[i];
+    if (v->iov_len > SSIZE_MAX || *total_size < SSIZE_MAX - v->iov_len) {
+      return false;
+    }
+    *total_size += v->iov_len;
+  }
+  return true;
+}
+
+int __isatty(int fd) {
+  if (fd < STDIN_FILENO || STDERR_FILENO < fd || fd_closed[fd]) {
+    errno = EBADF;
+    return 0;
+  }
+  errno = ENOTTY;
+  return 0;
+}
+weak_alias(__isatty, isatty);
+
+int close(int fd) {
+  if (fd < STDIN_FILENO || STDERR_FILENO < fd || fd_closed[fd]) {
+    errno = EBADF;
+    return -1;
+  }
+  fd_closed[fd] = true;
+  return 0;
+}
+
+ssize_t read(int fildes, void *buf, size_t nbyte) {
+  if (nbyte > SSIZE_MAX) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  switch (fildes) {
+    case STDIN_FILENO: 
+      if (fd_closed[fildes]) {
+        errno = EBADF;
+        return -1;
+      }
+      return 0; // immediate EOF
+    default:
+      errno = EBADF;
+      return -1;
+  }
+}
+
+ssize_t readv(int fildes, const struct iovec *iov, int iovcnt) {
+  if (iovcnt < 0 || IOV_MAX < iovcnt) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  size_t total_size;
+  if (!iovecs_ok(iov, iovcnt, &total_size)) {
+    errno = EINVAL;
+    return -1;
+  }
+  for (int i = 0; i < iovcnt; i++) {
+    int res = read(fildes, iov->iov_base, iov->iov_len);
+    if (res < 0) {
+      // errno already set
+      return res;
+    }
+  }
+  return total_size;
+}
+
+ssize_t write(int fildes, const void *buf, size_t nbyte) {
+  if (nbyte > SSIZE_MAX) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  switch (fildes) {
+    case STDOUT_FILENO:
+    case STDERR_FILENO:
+      if (fd_closed[fildes]) {
+        errno = EBADF;
+        return -1;
+      }
+      line_buffer_t* line_buffer = &line_buffers[fildes-1];
+      for (size_t i = 0; i < nbyte; i++) {
+        // TODO(webp2): UTF-8
+        uint8_t c = ((uint8_t*)buf)[i];
+        // TODO(webp2): Handle \r
+        if (c == '\n' || line_buffer->len >= LINE_BUF_SIZE) {
+          flush_line_buffer(line_buffer);
+        }
+        line_buffer->buf[line_buffer->len] = c;
+        line_buffer->len++;
+      }
+      return nbyte;
+    default:
+      errno = EBADF;
+      return -1;
+  }
+}
+
+ssize_t writev(int fildes, const struct iovec *iov, int iovcnt) {
+  if (iovcnt < 0 || IOV_MAX < iovcnt) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  size_t total_size;
+  if (!iovecs_ok(iov, iovcnt, &total_size)) {
+    errno = EINVAL;
+    return -1;
+  }
+  for (int i = 0; i < iovcnt; i++) {
+    int res = write(fildes, iov->iov_base, iov->iov_len);
+    if (res < 0) {
+      // errno already set
+      return res;
+    }
+  }
+  return total_size;
+}
+
+// ============================================================================
+// Stubs
+
+int __dup3(int fd, int newfd, int flags) { WEBP2_UNSUPPORTED("__dup3"); }
 
 off_t __lseek(int fildes, off_t offset, int whence) {
-  WEBP2_UNSUPPORTED("lseek");
+  WEBP2_UNSUPPORTED("__lseek");
 }
 
 off_t __wasilibc_tell(int fd) { WEBP2_UNSUPPORTED("__wasilibc_tell"); }
-
-int close(int fd) { WEBP2_UNSUPPORTED("close"); }
 
 int dup(int fd) { WEBP2_UNSUPPORTED("dup"); }
 
@@ -35,8 +185,6 @@ int fcntl(int fildes, int cmd, ...) { WEBP2_UNSUPPORTED("fcntl"); }
 int fstat(int fildes, struct stat *buf) { WEBP2_UNSUPPORTED("fstat"); }
 
 int ioctl(int fildes, int request, ...) { WEBP2_UNSUPPORTED("ioctl"); }
-
-int isatty(int fd) { WEBP2_UNSUPPORTED("isatty"); }
 
 off_t lseek(int fildes, off_t offset, int whence) {
   WEBP2_UNSUPPORTED("lseek");
@@ -61,21 +209,7 @@ int pselect(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
   WEBP2_UNSUPPORTED("pselect");
 }
 
-ssize_t read(int fildes, void *buf, size_t nbyte) { WEBP2_UNSUPPORTED("read"); }
-
-ssize_t readv(int fildes, const struct iovec *iov, int iovcnt) {
-  WEBP2_UNSUPPORTED("readv");
-}
-
 int select(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
            fd_set *restrict errorfds, struct timeval *restrict timeout) {
   WEBP2_UNSUPPORTED("select");
-}
-
-ssize_t write(int fildes, const void *buf, size_t nbyte) {
-  WEBP2_UNSUPPORTED("write");
-}
-
-ssize_t writev(int fildes, const struct iovec *iov, int iovcnt) {
-  WEBP2_UNSUPPORTED("writev");
 }

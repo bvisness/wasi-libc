@@ -35,6 +35,11 @@ extern void __wasm_import_webp2_method_crypto_get_random_values(int32_t, int32_t
 __attribute__((__import_module__("wasm:js/global"), __import_name__("[get]global-crypto")))
 extern int32_t __wasm_import_webp2_get_global_crypto(void);
 
+// Imported Functions from `wasm:js/console`
+
+__attribute__((__import_module__("wasm:js/console"), __import_name__("log")))
+extern void __wasm_import_webp2_console_log(uint8_t *, size_t);
+
 // Canonical ABI intrinsics
 
 __attribute__((__weak__, __export_name__("cabi_realloc")))
@@ -275,6 +280,10 @@ void webp2_method_crypto_get_random_values(webp2_borrow_crypto_t self, webp2_bor
 webp2_own_crypto_t webp2_get_global_crypto(void) {
   int32_t ret = __wasm_import_webp2_get_global_crypto();
   return (webp2_own_crypto_t) { ret };
+}
+
+void webp2_console_log(webp2_string_t *msg) {
+  __wasm_import_webp2_console_log((uint8_t *) (*msg).ptr, (*msg).len);
 }
 
 // Ensure that the *_component_type.o object is linked in

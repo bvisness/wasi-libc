@@ -1,5 +1,11 @@
 package wasm:js;
 
+// TODO(webp2): If we had nested interfaces we could avoid this external-id.
+@external-id("wasm:js/global/console")
+interface console {
+    log: func(msg: string);
+}
+
 interface global {
     resource performance {
         now: func() -> f64;
